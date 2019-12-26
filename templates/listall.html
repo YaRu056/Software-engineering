@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>顯示所有資料</title>
+	</head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+
+<script>
+        //你的liff app ID, 例如 --> 0000000000-spPeRmAn
+        var YourLiffAppId = '1653654903-e6GxJ4Pd';
+ 
+        function initializeLiff(myLiffId) {
+            liff
+                .init({
+                    liffId: myLiffId
+                })
+                .then(() => {
+                    //取得QueryString
+                    let urlParams = new URLSearchParams(window.location.search);
+                    //顯示QueryString
+                    $('#QueryString').val(urlParams.toString());
+                    //顯示UserId
+                    liff.getProfile().then(function (e) {
+                        $('#field_info').val(e.userId);
+                    });
+                })
+                .catch((err) => {
+                    alert(JSON.stringify(err));
+                });
+        }
+
+        /*
+        function pushMsg(puserid, pname, pstudent_number) {
+        if (pname == '' || pstudent_number == '') {  //資料檢查
+            alert('每個項目都必須輸入！');
+            return;
+        }
+        
+
+        var msg = "!!!";  //回傳訊息字串
+        msg = msg + puserid + "/";
+        msg = msg + pname + "/";
+        msg = msg + pstudent_number;
+
+
+        liff.sendMessages([  //推播訊息
+            { type: 'text',
+              text: msg
+            }
+            
+        ])
+            .then(() => {
+                liff.closeWindow();  //關閉視窗
+            });
+
+        }*/
+
+
+        $(document).ready(function () {
+            //init LIFF
+            initializeLiff(YourLiffAppId);
+
+            $('#btnGet').click(function () {  //按下確定鈕
+            	var message = "++";
+	            //Loop through all checked CheckBoxes in GridView.
+	          $("#Table1 input[type=checkbox]:checked").each(function () {
+                 var row = $(this).closest("tr")[0];
+                   //message += row.cells[1].innerHTML;
+	               //message += "   " + row.cells[2].innerHTML;
+	                message += row.cells[3].innerHTML;
+	                message += "/";
+               });
+
+	           //Display selected Row data in Alert Box.
+	           
+	           liff.sendMessages([  //推播訊息
+           		 { type: 'text',
+              	   text: message
+            	}
+            
+        		])
+            	.then(() => {
+                	liff.closeWindow();  //關閉視窗
+            	});
+
+       		 
+               
+            });
+            
+        });
+
+
+(function(document) {
+  'use strict';
+
+  // 建立 LightTableFilter
+  var LightTableFilter = (function(Arr) {
+
+    var _input;
+
+    // 資料輸入事件處理函數
+    function _onInputEvent(e) {
+      _input = e.target;
+      var tables = document.getElementsByClassName(_input.getAttribute('data-table'));
+      Arr.forEach.call(tables, function(table) {
+        Arr.forEach.call(table.tBodies, function(tbody) {
+          Arr.forEach.call(tbody.rows, _filter);
+        });
+      });
+    }
+
+    // 資料篩選函數，顯示包含關鍵字的列，其餘隱藏
+    function _filter(row) {
+      var text = row.textContent.toLowerCase(), val = _input.value.toLowerCase();
+      row.style.display = text.indexOf(val) === -1 ? 'none' : 'table-row';
+    }
+
+    return {
+      // 初始化函數
+      init: function() {
+        var inputs = document.getElementsByClassName('light-table-filter');
+        Arr.forEach.call(inputs, function(input) {
+          input.oninput = _onInputEvent;
+        });
+      }
+    };
+  })(Array.prototype);
+
+  // 網頁載入完成後，啟動 LightTableFilter
+  document.addEventListener('readystatechange', function() {
+    if (document.readyState === 'complete') {
+      LightTableFilter.init();
+    }
+  });
+
+})(document);
+
+</script>
+
+    <body>
+		<h2>  住宿學生 所有資料</h2>
+
+		搜尋：<input type="search" class="light-table-filter" data-table="order-table" placeholder="請輸入關鍵字"><br><br>
+
+		<table class="table table-striped table-bordered order-table " border="1" cellpadding="0" cellspacing="0" id="Table1">
+			<th></th><th>姓名</th><th>學號</th><th>user_id</th><th>建立時間</th>
+			{% for users in user %}
+				<tr>
+					<th><input name="select_many" id ="select_many" value="1" type="checkbox"></th>
+					<td>{{ users.name }} </td>
+					<td>{{ users.student_number }} </td>
+					<td>{{ users.uid }} </td>
+					<td>{{ users.created_time }} </td>
+					
+				</tr>
+			{% endfor %}
+		</table>
+		<br />
+		<input id = "btnGet" type="button" value="Get Selected" />
+
+
+<script type="text/javascript">
+
+</script>
+
+</body>
+</html>
+	

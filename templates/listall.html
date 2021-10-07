@@ -12,7 +12,7 @@
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 
 <script>
-        //你的liff app ID, 例如 --> 0000000000-spPeRmAn
+        //LIFF的id
         var YourLiffAppId = '1653654903-e6GxJ4Pd';
  
         function initializeLiff(myLiffId) {
@@ -21,11 +21,11 @@
                     liffId: myLiffId
                 })
                 .then(() => {
-                    //取得QueryString
+                    
                     let urlParams = new URLSearchParams(window.location.search);
-                    //顯示QueryString
+                   
                     $('#QueryString').val(urlParams.toString());
-                    //顯示UserId
+                    
                     liff.getProfile().then(function (e) {
                         $('#field_info').val(e.userId);
                     });
@@ -35,32 +35,6 @@
                 });
         }
 
-        /*
-        function pushMsg(puserid, pname, pstudent_number) {
-        if (pname == '' || pstudent_number == '') {  //資料檢查
-            alert('每個項目都必須輸入！');
-            return;
-        }
-        
-
-        var msg = "!!!";  //回傳訊息字串
-        msg = msg + puserid + "/";
-        msg = msg + pname + "/";
-        msg = msg + pstudent_number;
-
-
-        liff.sendMessages([  //推播訊息
-            { type: 'text',
-              text: msg
-            }
-            
-        ])
-            .then(() => {
-                liff.closeWindow();  //關閉視窗
-            });
-
-        }*/
-
 
         $(document).ready(function () {
             //init LIFF
@@ -68,16 +42,15 @@
 
             $('#btnGet').click(function () {  //按下確定鈕
             	var message = "++";
-	            //Loop through all checked CheckBoxes in GridView.
+	            
 	          $("#Table1 input[type=checkbox]:checked").each(function () {
                  var row = $(this).closest("tr")[0];
-                   //message += row.cells[1].innerHTML;
-	               //message += "   " + row.cells[2].innerHTML;
+       
 	                message += row.cells[3].innerHTML;
 	                message += "/";
                });
 
-	           //Display selected Row data in Alert Box.
+	           
 	           
 	           liff.sendMessages([  //推播訊息
            		 { type: 'text',
@@ -96,50 +69,45 @@
         });
 
 
-(function(document) {
-  'use strict';
+	(function(document) {
+	  'use strict';
+	  var LightTableFilter = (function(Arr) {
 
-  // 建立 LightTableFilter
-  var LightTableFilter = (function(Arr) {
+	    var _input;
 
-    var _input;
+	    function _onInputEvent(e) {
+	      _input = e.target;
+	      var tables = document.getElementsByClassName(_input.getAttribute('data-table'));
+	      Arr.forEach.call(tables, function(table) {
+	        Arr.forEach.call(table.tBodies, function(tbody) {
+	          Arr.forEach.call(tbody.rows, _filter);
+	        });
+	      });
+	    }
 
-    // 資料輸入事件處理函數
-    function _onInputEvent(e) {
-      _input = e.target;
-      var tables = document.getElementsByClassName(_input.getAttribute('data-table'));
-      Arr.forEach.call(tables, function(table) {
-        Arr.forEach.call(table.tBodies, function(tbody) {
-          Arr.forEach.call(tbody.rows, _filter);
-        });
-      });
-    }
+	    function _filter(row) {
+	      var text = row.textContent.toLowerCase(), val = _input.value.toLowerCase();
+	      row.style.display = text.indexOf(val) === -1 ? 'none' : 'table-row';
+	    }
 
-    // 資料篩選函數，顯示包含關鍵字的列，其餘隱藏
-    function _filter(row) {
-      var text = row.textContent.toLowerCase(), val = _input.value.toLowerCase();
-      row.style.display = text.indexOf(val) === -1 ? 'none' : 'table-row';
-    }
+	    return {
+	     
+	      init: function() {
+	        var inputs = document.getElementsByClassName('light-table-filter');
+	        Arr.forEach.call(inputs, function(input) {
+	          input.oninput = _onInputEvent;
+	        });
+	      }
+	    };
+	  })(Array.prototype);
 
-    return {
-      // 初始化函數
-      init: function() {
-        var inputs = document.getElementsByClassName('light-table-filter');
-        Arr.forEach.call(inputs, function(input) {
-          input.oninput = _onInputEvent;
-        });
-      }
-    };
-  })(Array.prototype);
+	  document.addEventListener('readystatechange', function() {
+	    if (document.readyState === 'complete') {
+	      LightTableFilter.init();
+	    }
+	  });
 
-  // 網頁載入完成後，啟動 LightTableFilter
-  document.addEventListener('readystatechange', function() {
-    if (document.readyState === 'complete') {
-      LightTableFilter.init();
-    }
-  });
-
-})(document);
+	})(document);
 
 </script>
 
@@ -164,10 +132,6 @@
 		<br />
 		<input id = "btnGet" type="button" value="Get Selected" />
 
-
-<script type="text/javascript">
-
-</script>
 
 </body>
 </html>

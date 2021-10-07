@@ -21,3 +21,10 @@ class fix(models.Model):
     created_time = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.cName
+
+class manager(models.Model):
+    aid = models.CharField(max_length=50, null=False)
+    name = models.CharField(max_length=20)
+    student_number = models.CharField(max_length=10)
+    def __str__(self):
+        return self.name

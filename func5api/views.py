@@ -38,11 +38,11 @@ def callback(request):
                     elif mtext =='@修繕查詢':
                         func.fix_inquire(event, user_id)
                     elif mtext == 'admin_mode':
-                         func.adminMode(event, user_id)
-                    elif mtext[:6] == '123456' and len(mtext) > 6:
-                         func.pushMessage_all(event, mtext)
-                    elif mtext[:2] == '++' and len(mtext) > 2:
-                         func.pushMessage_specify(event, mtext)
+                         func.judge(event, mtext, user_id)
+                    elif mtext[:6] == '123456' and len(mtext) > 6:   #all
+                         func.judge(event, mtext, user_id)
+                    elif mtext[:2] == '++' and len(mtext) > 2:       #specify
+                         func.judge(event, mtext, user_id)
                     elif mtext[:2] == '##' and len(mtext) > 2:
                          func.manageForm(event, mtext, user_id)
                     elif mtext[:3] == '!!!' and len(mtext) > 3:

@@ -3,7 +3,7 @@ from django.conf import settings
 from linebot import LineBotApi
 from linebot.models import TextSendMessage, BubbleContainer, ImageComponent, BoxComponent, TextComponent, IconComponent, ButtonComponent, SeparatorComponent, FlexSendMessage, URIAction, ImageSendMessage, TemplateSendMessage, ButtonsTemplate, URITemplateAction, ConfirmTemplate, PostbackTemplateAction
 
-from func5api.models import fix,users
+from func5api.models import fix,users,manager
 
 from django.db.models import Q
 
@@ -12,11 +12,11 @@ line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 
 def sendFix(event, user_id):    #修繕表單申請
     try:
-        if not (fix.objects.filter(fid=user_id).filter(status__exact = '未處理').exists()):  #沒有訂房記錄
+        if not (fix.objects.filter(fid=user_id).filter(status__exact = '未處理').exists()):
             message = TemplateSendMessage(
                 alt_text = "修繕申請",
                 template = ButtonsTemplate(
-                    thumbnail_image_url='https://i.imgur.com/1NSDAvo.jpg',
+                    thumbnail_image_url='https://i.imgur.com/zJg4ib0.png',
                     title='修繕申請',
                     text='您目前沒有未完成的修繕申請，可以開始填寫表單。',
                     actions=[
@@ -141,34 +141,36 @@ def personData(event, mtext, user_id):
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text='發生錯誤！'))
 
 
-def pushMessage_all(event, mtext):  #推播訊息給所有使用者
+def pushMessage_all(event, mtext, user_id):  #推播訊息給所有使用者
     try:
-        msg = mtext[6:]  #取得訊息
+        msg = mtext[6:]
         userall = users.objects.all()
-        for user in userall:  #逐一推播
+        for user in userall:
             message = TextSendMessage(
                 text = msg
             )
-            line_bot_api.push_message(to=user.uid, messages=[message])  #推播訊息
+            line_bot_api.push_message(to=user.uid, messages=[message])
     except:
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text='發生錯誤！'))
 
-
-def pushMessage_specify(event, mtext):  #推播訊息給特定使用者
+#推播訊息給特定使用者
+def pushMessage_specify(event, mtext, user_id):
     try:
-        slist = mtext[2:].split(' /')
-        slist = slist[:-1]
+       if manager.objects.filter(aid=user_id).exists():
+         slist = mtext[2:].split(' /')
+         slist = slist[:-1]
         
-        message = TextSendMessage(
-            text = '同學您好，您有包裹送達宿舍，請儘速持學生證到櫃台簽收！'
-        )
+         message = TextSendMessage(
+             text = '同學您好，您有包裹送達宿舍，請儘速持學生證到櫃台簽收！'
+         )
         
-        for i in slist:
+         for i in slist:
             
-            line_bot_api.push_message(to=i, messages=[message])
+             line_bot_api.push_message(to=i, messages=[message])
         
     except:
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text='發生錯誤！'))
+
 
 def adminMode(event, user_id):
     try:
@@ -179,3 +181,18 @@ def adminMode(event, user_id):
         line_bot_api.reply_message(event.reply_token,message)
     except:
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text='發生錯誤！'))
+
+
+
+def judge(event, mtext, user_id):    #判斷是否為管理者
+    try:
+        if manager.objects.filter(aid=user_id).exists():
+            if(mtext[:6] == '123456' and len(mtext) > 6):
+                pushMessage_all(event, mtext, user_id)
+            elif(mtext[:2] == '++' and len(mtext) > 2):
+                pushMessage_specify(event, mtext, user_id)
+            elif(mtext == 'admin_mode'):
+                adminMode(event, user_id)
+    except:
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='發生錯誤！'))
+
